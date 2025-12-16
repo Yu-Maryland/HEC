@@ -1,0 +1,203 @@
+#map = affine_map<()[s0] -> (s0 - 1)>
+#map1 = affine_map<()[s0] -> (((s0 - 2) floordiv 3) * 3 + 1)>
+#map2 = affine_map<(d0) -> (d0 + 1)>
+#map3 = affine_map<(d0) -> (d0 + 2)>
+module attributes {dlti.dl_spec = #dlti.dl_spec<#dlti.dl_entry<i8, dense<8> : vector<2xi32>>, #dlti.dl_entry<i1, dense<8> : vector<2xi32>>, #dlti.dl_entry<!llvm.ptr, dense<64> : vector<4xi32>>, #dlti.dl_entry<f16, dense<16> : vector<2xi32>>, #dlti.dl_entry<i32, dense<32> : vector<2xi32>>, #dlti.dl_entry<i16, dense<16> : vector<2xi32>>, #dlti.dl_entry<!llvm.ptr<272>, dense<64> : vector<4xi32>>, #dlti.dl_entry<!llvm.ptr<271>, dense<32> : vector<4xi32>>, #dlti.dl_entry<!llvm.ptr<270>, dense<32> : vector<4xi32>>, #dlti.dl_entry<f64, dense<64> : vector<2xi32>>, #dlti.dl_entry<f128, dense<128> : vector<2xi32>>, #dlti.dl_entry<f80, dense<128> : vector<2xi32>>, #dlti.dl_entry<i64, dense<64> : vector<2xi32>>, #dlti.dl_entry<"dlti.stack_alignment", 128 : i32>, #dlti.dl_entry<"dlti.endianness", "little">>, llvm.data_layout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128", llvm.target_triple = "x86_64-unknown-linux-gnu", "polygeist.target-cpu" = "x86-64", "polygeist.target-features" = "+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87", "polygeist.tune-cpu" = "generic"} {
+  func.func @kernel_heat_3d(%arg0: i32, %arg1: i32, %arg2: memref<?x120x120xf64>, %arg3: memref<?x120x120xf64>) attributes {llvm.linkage = #llvm.linkage<external>} {
+    %cst = arith.constant 1.250000e-01 : f64
+    %cst_0 = arith.constant 2.000000e+00 : f64
+    %0 = arith.index_cast %arg1 : i32 to index
+    affine.for %arg4 = 1 to 501 {
+      affine.for %arg5 = 1 to #map()[%0] {
+        affine.for %arg6 = 1 to #map()[%0] {
+          affine.for %arg7 = 1 to #map1()[%0] step 3 {
+            %1 = affine.load %arg2[%arg5 + 1, %arg6, %arg7] : memref<?x120x120xf64>
+            %2 = affine.load %arg2[%arg5, %arg6, %arg7] : memref<?x120x120xf64>
+            %3 = arith.mulf %2, %cst_0 : f64
+            %4 = arith.subf %1, %3 : f64
+            %5 = affine.load %arg2[%arg5 - 1, %arg6, %arg7] : memref<?x120x120xf64>
+            %6 = arith.addf %4, %5 : f64
+            %7 = arith.mulf %6, %cst : f64
+            %8 = affine.load %arg2[%arg5, %arg6 + 1, %arg7] : memref<?x120x120xf64>
+            %9 = arith.subf %8, %3 : f64
+            %10 = affine.load %arg2[%arg5, %arg6 - 1, %arg7] : memref<?x120x120xf64>
+            %11 = arith.addf %9, %10 : f64
+            %12 = arith.mulf %11, %cst : f64
+            %13 = arith.addf %7, %12 : f64
+            %14 = affine.load %arg2[%arg5, %arg6, %arg7 + 1] : memref<?x120x120xf64>
+            %15 = arith.subf %14, %3 : f64
+            %16 = affine.load %arg2[%arg5, %arg6, %arg7 - 1] : memref<?x120x120xf64>
+            %17 = arith.addf %15, %16 : f64
+            %18 = arith.mulf %17, %cst : f64
+            %19 = arith.addf %13, %18 : f64
+            %20 = arith.addf %19, %2 : f64
+            affine.store %20, %arg3[%arg5, %arg6, %arg7] : memref<?x120x120xf64>
+            %21 = affine.apply #map2(%arg7)
+            %22 = affine.load %arg2[%arg5 + 1, %arg6, %21] : memref<?x120x120xf64>
+            %23 = affine.load %arg2[%arg5, %arg6, %21] : memref<?x120x120xf64>
+            %24 = arith.mulf %23, %cst_0 : f64
+            %25 = arith.subf %22, %24 : f64
+            %26 = affine.load %arg2[%arg5 - 1, %arg6, %21] : memref<?x120x120xf64>
+            %27 = arith.addf %25, %26 : f64
+            %28 = arith.mulf %27, %cst : f64
+            %29 = affine.load %arg2[%arg5, %arg6 + 1, %21] : memref<?x120x120xf64>
+            %30 = arith.subf %29, %24 : f64
+            %31 = affine.load %arg2[%arg5, %arg6 - 1, %21] : memref<?x120x120xf64>
+            %32 = arith.addf %30, %31 : f64
+            %33 = arith.mulf %32, %cst : f64
+            %34 = arith.addf %28, %33 : f64
+            %35 = affine.load %arg2[%arg5, %arg6, %21 + 1] : memref<?x120x120xf64>
+            %36 = arith.subf %35, %24 : f64
+            %37 = affine.load %arg2[%arg5, %arg6, %21 - 1] : memref<?x120x120xf64>
+            %38 = arith.addf %36, %37 : f64
+            %39 = arith.mulf %38, %cst : f64
+            %40 = arith.addf %34, %39 : f64
+            %41 = arith.addf %40, %23 : f64
+            affine.store %41, %arg3[%arg5, %arg6, %21] : memref<?x120x120xf64>
+            %42 = affine.apply #map3(%arg7)
+            %43 = affine.load %arg2[%arg5 + 1, %arg6, %42] : memref<?x120x120xf64>
+            %44 = affine.load %arg2[%arg5, %arg6, %42] : memref<?x120x120xf64>
+            %45 = arith.mulf %44, %cst_0 : f64
+            %46 = arith.subf %43, %45 : f64
+            %47 = affine.load %arg2[%arg5 - 1, %arg6, %42] : memref<?x120x120xf64>
+            %48 = arith.addf %46, %47 : f64
+            %49 = arith.mulf %48, %cst : f64
+            %50 = affine.load %arg2[%arg5, %arg6 + 1, %42] : memref<?x120x120xf64>
+            %51 = arith.subf %50, %45 : f64
+            %52 = affine.load %arg2[%arg5, %arg6 - 1, %42] : memref<?x120x120xf64>
+            %53 = arith.addf %51, %52 : f64
+            %54 = arith.mulf %53, %cst : f64
+            %55 = arith.addf %49, %54 : f64
+            %56 = affine.load %arg2[%arg5, %arg6, %42 + 1] : memref<?x120x120xf64>
+            %57 = arith.subf %56, %45 : f64
+            %58 = affine.load %arg2[%arg5, %arg6, %42 - 1] : memref<?x120x120xf64>
+            %59 = arith.addf %57, %58 : f64
+            %60 = arith.mulf %59, %cst : f64
+            %61 = arith.addf %55, %60 : f64
+            %62 = arith.addf %61, %44 : f64
+            affine.store %62, %arg3[%arg5, %arg6, %42] : memref<?x120x120xf64>
+          }
+          affine.for %arg7 = #map1()[%0] to #map()[%0] {
+            %1 = affine.load %arg2[%arg5 + 1, %arg6, %arg7] : memref<?x120x120xf64>
+            %2 = affine.load %arg2[%arg5, %arg6, %arg7] : memref<?x120x120xf64>
+            %3 = arith.mulf %2, %cst_0 : f64
+            %4 = arith.subf %1, %3 : f64
+            %5 = affine.load %arg2[%arg5 - 1, %arg6, %arg7] : memref<?x120x120xf64>
+            %6 = arith.addf %4, %5 : f64
+            %7 = arith.mulf %6, %cst : f64
+            %8 = affine.load %arg2[%arg5, %arg6 + 1, %arg7] : memref<?x120x120xf64>
+            %9 = arith.subf %8, %3 : f64
+            %10 = affine.load %arg2[%arg5, %arg6 - 1, %arg7] : memref<?x120x120xf64>
+            %11 = arith.addf %9, %10 : f64
+            %12 = arith.mulf %11, %cst : f64
+            %13 = arith.addf %7, %12 : f64
+            %14 = affine.load %arg2[%arg5, %arg6, %arg7 + 1] : memref<?x120x120xf64>
+            %15 = arith.subf %14, %3 : f64
+            %16 = affine.load %arg2[%arg5, %arg6, %arg7 - 1] : memref<?x120x120xf64>
+            %17 = arith.addf %15, %16 : f64
+            %18 = arith.mulf %17, %cst : f64
+            %19 = arith.addf %13, %18 : f64
+            %20 = arith.addf %19, %2 : f64
+            affine.store %20, %arg3[%arg5, %arg6, %arg7] : memref<?x120x120xf64>
+          }
+        }
+      }
+      affine.for %arg5 = 1 to #map()[%0] {
+        affine.for %arg6 = 1 to #map()[%0] {
+          affine.for %arg7 = 1 to #map1()[%0] step 3 {
+            %1 = affine.load %arg3[%arg5 + 1, %arg6, %arg7] : memref<?x120x120xf64>
+            %2 = affine.load %arg3[%arg5, %arg6, %arg7] : memref<?x120x120xf64>
+            %3 = arith.mulf %2, %cst_0 : f64
+            %4 = arith.subf %1, %3 : f64
+            %5 = affine.load %arg3[%arg5 - 1, %arg6, %arg7] : memref<?x120x120xf64>
+            %6 = arith.addf %4, %5 : f64
+            %7 = arith.mulf %6, %cst : f64
+            %8 = affine.load %arg3[%arg5, %arg6 + 1, %arg7] : memref<?x120x120xf64>
+            %9 = arith.subf %8, %3 : f64
+            %10 = affine.load %arg3[%arg5, %arg6 - 1, %arg7] : memref<?x120x120xf64>
+            %11 = arith.addf %9, %10 : f64
+            %12 = arith.mulf %11, %cst : f64
+            %13 = arith.addf %7, %12 : f64
+            %14 = affine.load %arg3[%arg5, %arg6, %arg7 + 1] : memref<?x120x120xf64>
+            %15 = arith.subf %14, %3 : f64
+            %16 = affine.load %arg3[%arg5, %arg6, %arg7 - 1] : memref<?x120x120xf64>
+            %17 = arith.addf %15, %16 : f64
+            %18 = arith.mulf %17, %cst : f64
+            %19 = arith.addf %13, %18 : f64
+            %20 = arith.addf %19, %2 : f64
+            affine.store %20, %arg2[%arg5, %arg6, %arg7] : memref<?x120x120xf64>
+            %21 = affine.apply #map2(%arg7)
+            %22 = affine.load %arg3[%arg5 + 1, %arg6, %21] : memref<?x120x120xf64>
+            %23 = affine.load %arg3[%arg5, %arg6, %21] : memref<?x120x120xf64>
+            %24 = arith.mulf %23, %cst_0 : f64
+            %25 = arith.subf %22, %24 : f64
+            %26 = affine.load %arg3[%arg5 - 1, %arg6, %21] : memref<?x120x120xf64>
+            %27 = arith.addf %25, %26 : f64
+            %28 = arith.mulf %27, %cst : f64
+            %29 = affine.load %arg3[%arg5, %arg6 + 1, %21] : memref<?x120x120xf64>
+            %30 = arith.subf %29, %24 : f64
+            %31 = affine.load %arg3[%arg5, %arg6 - 1, %21] : memref<?x120x120xf64>
+            %32 = arith.addf %30, %31 : f64
+            %33 = arith.mulf %32, %cst : f64
+            %34 = arith.addf %28, %33 : f64
+            %35 = affine.load %arg3[%arg5, %arg6, %21 + 1] : memref<?x120x120xf64>
+            %36 = arith.subf %35, %24 : f64
+            %37 = affine.load %arg3[%arg5, %arg6, %21 - 1] : memref<?x120x120xf64>
+            %38 = arith.addf %36, %37 : f64
+            %39 = arith.mulf %38, %cst : f64
+            %40 = arith.addf %34, %39 : f64
+            %41 = arith.addf %40, %23 : f64
+            affine.store %41, %arg2[%arg5, %arg6, %21] : memref<?x120x120xf64>
+            %42 = affine.apply #map3(%arg7)
+            %43 = affine.load %arg3[%arg5 + 1, %arg6, %42] : memref<?x120x120xf64>
+            %44 = affine.load %arg3[%arg5, %arg6, %42] : memref<?x120x120xf64>
+            %45 = arith.mulf %44, %cst_0 : f64
+            %46 = arith.subf %43, %45 : f64
+            %47 = affine.load %arg3[%arg5 - 1, %arg6, %42] : memref<?x120x120xf64>
+            %48 = arith.addf %46, %47 : f64
+            %49 = arith.mulf %48, %cst : f64
+            %50 = affine.load %arg3[%arg5, %arg6 + 1, %42] : memref<?x120x120xf64>
+            %51 = arith.subf %50, %45 : f64
+            %52 = affine.load %arg3[%arg5, %arg6 - 1, %42] : memref<?x120x120xf64>
+            %53 = arith.addf %51, %52 : f64
+            %54 = arith.mulf %53, %cst : f64
+            %55 = arith.addf %49, %54 : f64
+            %56 = affine.load %arg3[%arg5, %arg6, %42 + 1] : memref<?x120x120xf64>
+            %57 = arith.subf %56, %45 : f64
+            %58 = affine.load %arg3[%arg5, %arg6, %42 - 1] : memref<?x120x120xf64>
+            %59 = arith.addf %57, %58 : f64
+            %60 = arith.mulf %59, %cst : f64
+            %61 = arith.addf %55, %60 : f64
+            %62 = arith.addf %61, %44 : f64
+            affine.store %62, %arg2[%arg5, %arg6, %42] : memref<?x120x120xf64>
+          }
+          affine.for %arg7 = #map1()[%0] to #map()[%0] {
+            %1 = affine.load %arg3[%arg5 + 1, %arg6, %arg7] : memref<?x120x120xf64>
+            %2 = affine.load %arg3[%arg5, %arg6, %arg7] : memref<?x120x120xf64>
+            %3 = arith.mulf %2, %cst_0 : f64
+            %4 = arith.subf %1, %3 : f64
+            %5 = affine.load %arg3[%arg5 - 1, %arg6, %arg7] : memref<?x120x120xf64>
+            %6 = arith.addf %4, %5 : f64
+            %7 = arith.mulf %6, %cst : f64
+            %8 = affine.load %arg3[%arg5, %arg6 + 1, %arg7] : memref<?x120x120xf64>
+            %9 = arith.subf %8, %3 : f64
+            %10 = affine.load %arg3[%arg5, %arg6 - 1, %arg7] : memref<?x120x120xf64>
+            %11 = arith.addf %9, %10 : f64
+            %12 = arith.mulf %11, %cst : f64
+            %13 = arith.addf %7, %12 : f64
+            %14 = affine.load %arg3[%arg5, %arg6, %arg7 + 1] : memref<?x120x120xf64>
+            %15 = arith.subf %14, %3 : f64
+            %16 = affine.load %arg3[%arg5, %arg6, %arg7 - 1] : memref<?x120x120xf64>
+            %17 = arith.addf %15, %16 : f64
+            %18 = arith.mulf %17, %cst : f64
+            %19 = arith.addf %13, %18 : f64
+            %20 = arith.addf %19, %2 : f64
+            affine.store %20, %arg2[%arg5, %arg6, %arg7] : memref<?x120x120xf64>
+          }
+        }
+      }
+    }
+    return
+  }
+}
+
