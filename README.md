@@ -2,7 +2,7 @@
 
 [![Paper](https://img.shields.io/badge/Paper-ACM%20DL-blue)](https://dl.acm.org/doi/10.5555/3768039.3768108)
 
-HEC is an MLIR-fronted framework that uses e-graphs to **prove** source-to-source transformations correct (control-flow and datapath). It normalizes MLIR, lowers it into an e-graph friendly form, and uses a customized `egg` backend with dynamic + static rewrites (tiling, unrolling, fusion, algebraic simplification, const folding) to certify equivalence. The ATC’25 paper (LaTeX sources in `atc_25_HEC/`) shows HEC scaling to 100K+ lines of PolyBenchC MLIR in ~40 minutes and uncovering real `mlir-opt` bugs (loop boundary checks and fusion RAW violations).
+HEC is an MLIR-fronted framework that uses e-graphs to **prove** source-to-source transformations correct (control-flow and datapath). It normalizes MLIR, lowers it into an e-graph friendly form, and uses a customized `egg` backend with dynamic + static rewrites (tiling, unrolling, fusion, algebraic simplification, const folding) to certify equivalence. Our ATC’25 paper shows HEC scaling to 100K+ lines of PolyBenchC MLIR in ~40 minutes and uncovering real `mlir-opt` bugs (loop boundary checks and fusion RAW violations).
 
 ## ✨ What’s special
 - 🧠 **Holistic MLIR-aware front end**: Preprocesses SSA, parses affine/loop constructs, and builds a typed hypergraph that unifies variable renaming, loop decomposition, and op tracking—covering both control-flow and datapath transformations.
