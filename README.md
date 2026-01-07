@@ -1,4 +1,5 @@
-# HEC: Equivalence Checking via Equality Saturation
+# HEC: Equivalence Verification Checking for Code Transformation via Equality Saturation (ATC'25)
+
 
 [![Paper](https://img.shields.io/badge/arXiv-2506.02290-b31b1b.svg)](https://arxiv.org/abs/2506.02290)
 
